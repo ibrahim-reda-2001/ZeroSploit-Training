@@ -1,0 +1,61 @@
+services:
+  vprodb:
+    build:
+      context: ./Docker-files/db
+    image: ibrahimelmsery1/vprofiledb
+    container_name: vprodb ## it must align with the service name db in -> vprofile-project/src/main/resources/application.properties
+    ports:
+      - "3306:3306"
+    volumes:
+      - vprodbdata:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=vprodbpass
+    networks:
+      - vpro-network
+
+  vprocache01:
+    image: memcached
+    ports:
+      - "11211:11211"
+    networks:
+      - vpro-network
+
+  vpromq01:
+    image: rabbitmq
+    ports:
+      - "5672:5672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest ## it must align with the service name db in -> vprofile-project/src/main/resources/application.properties
+      - RABBITMQ_DEFAULT_PASS=guest
+    networks:
+      - vpro-network
+
+  vproapp:
+    build:
+      context: ./Docker-files/app
+    image: ibrahimelmsery1/vprofileapp
+    container_name: vproapp
+    ports:
+      - "8080:8080"
+    volumes:
+      - vproappdata:/usr/local/tomcat/webapps
+    networks:
+      - vpro-network
+
+  vproweb:
+    build:
+      context: ./Docker-files/web
+    image: ibrahimelmsery1/vprofileweb
+    container_name: vproweb
+    ports:
+      - "80:80"
+    networks:
+      - vpro-network
+
+volumes:
+  vprodbdata: {}
+  vproappdata: {}
+
+networks:
+  vpro-network:
+    driver: bridge

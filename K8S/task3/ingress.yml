@@ -10,10 +10,10 @@ spec:
   - host: vpro.local
     http:
       paths: 
-        paths: /
-        pathType: Prefix
-        backend:
-          service:
-            name: vproapp-service
-            port:
-              number: 8080
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: vproapp-service
+              port:
+                number: 8080

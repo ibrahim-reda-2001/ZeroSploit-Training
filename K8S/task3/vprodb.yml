@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: vprodb
+  labels:
+    app: vprodb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vprodb
+  template:
+    metadata:
+      labels:
+        app: vprodb
+    spec:
+      containers:
+      - name: vprodb
+        image: ibrahimelmsery1/vprofiledb
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: vproapp-secret
+              key: db-pass
+        ports:
+        - containerPort: 3306
+          name: mysql
+        volumeMounts:
+        - name: db-persistent-storage
+          mountPath: /var/lib/mysql
+  volumeClaimTemplates:
+  - metadata:
+      name: db-persistent-storage
+    spec:
+      storageClassName: rook-cephfs 
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi  
+  initContainers:        

@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  namespace: ibrahimreda
+  name: iris-psql-db-statefulset
+  labels:
+    app: iris-psql
+    site: iris
+spec:
+  serviceName: "iris-psql-db"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: iris-psql
+  template:
+    metadata:
+      labels:
+        app: iris-psql
+    spec:
+      containers:
+      - name: iris-psql-db
+        image: ghcr.io/dfir-iris/iriswebapp_db
+        ports:
+        - containerPort: 5432
+        env:
+          - name: POSTGRES_USER
+            valueFrom:
+              secretKeyRef:
+                name: iris-psql-secrets
+                key: POSTGRES_USER
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: iris-psql-secrets
+                key: POSTGRES_PASSWORD
+          - name: POSTGRES_ADMIN_USER
+            valueFrom:
+              secretKeyRef:
+                name: iris-psql-secrets
+                key: POSTGRES_ADMIN_USER
+          - name: POSTGRES_ADMIN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: iris-psql-secrets
+                key: POSTGRES_ADMIN_PASSWORD
+          - name: POSTGRES_DB
+            valueFrom:
+              secretKeyRef:
+                name: iris-psql-secrets
+                key: POSTGRES_DB
+        volumeMounts:
+        - name: persistent-storage
+          mountPath: /var/lib/postgresql/data
+          subPath: psqldata
+  volumeClaimTemplates:
+  - metadata:
+      name: persistent-storage
+    spec:
+      storageClassName: rook-cephfs
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: iris-worker-service
+  labels:
+    site: iris
+spec:
+  selector:
+    app: iris-worker
+  ports:
+  - protocol: TCP
+    port: 80
+  type: ClusterIP

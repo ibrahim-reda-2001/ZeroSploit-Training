@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: ibrahimreda
+  name: iris-psql-service
+  labels:
+    site: iris
+spec:
+  clusterIP: None
+  selector:
+    app: iris-psql
+  ports:
+  - protocol: TCP
+    port: 5432
+    targetPort: 5432
+
